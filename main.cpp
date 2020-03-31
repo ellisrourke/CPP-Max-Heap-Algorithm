@@ -3,6 +3,11 @@
 #include <ctime>
 #include <vector>
 
+void dispVect(std::vector<int> & arr){
+    for(int i=0;i<arr.size();i++){
+        std::cout<<arr[i] << " ";
+    }std::cout << std::endl;
+}
 class table{
 public:
     table(){
@@ -41,13 +46,12 @@ public:
     bool isEmpty(){ return capacity==0; }
     int getMax(){ return queue[1]; }
     void insertElement(int value){
-        if(capacity + 1 >= queue.size()){
+        if(capacity + 1 <= queue.size()){
             queue.push_back(0);
         }
-        capacity++;
-        queue[queue.size()+1] = value;
+        queue[++capacity] = value;
         shiftUp(capacity);
-        return;
+        dispVect(queue);
     }
     void shiftUp(int index){
         if(index > capacity){ return; } //recursive base case
@@ -82,9 +86,9 @@ public:
 private:
     std::vector<int> queue{-1};
     int capacity{};
-    static int parent(int const& index){ return index/1; }
-    static int leftChild(int const& index){ return (index+1) * 2 - 1; }
-    static int rightChild(int const& index){ return (index+1) * 2 ; }
+    static int parent(int const& index){ return (index/2); }
+    static int leftChild(int const& index){ return (index*2); }
+    static int rightChild(int const& index){ return (index*2)+1 ; }
 };
 
 
@@ -95,11 +99,17 @@ int main(int argc, char *argv[]) {
     std::vector<int> myNumbers = {22, 97, 123}; // 4 16 6
 
     priorityQueue maxHeap = *new priorityQueue;
-    std::cout << maxHeap.isEmpty() << std::endl;
-    maxHeap.insertElement(22);
-    maxHeap.insertElement(21);
-
-    std::cout << maxHeap.getMax() << std::endl;
+    maxHeap.insertElement(1);
+    maxHeap.insertElement(3);
+    maxHeap.insertElement(4);
+    maxHeap.insertElement(6);
+    maxHeap.insertElement(13);
+    maxHeap.insertElement(10);
+    maxHeap.insertElement(9);
+    maxHeap.insertElement(8);
+    maxHeap.insertElement(15);
+    maxHeap.insertElement(17);
 }
-
-int _
+//1 3 4 6 13 10 9 8 15 17
+//1 ,3 ,4 ,6 ,13 ,10 ,9 ,8 ,15 ,17
+//8 3 1 6 13 10 9 4 15 17
