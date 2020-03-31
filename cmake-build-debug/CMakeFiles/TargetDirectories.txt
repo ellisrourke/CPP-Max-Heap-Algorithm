@@ -1,0 +1,3 @@
+C:/Users/Ellis/Documents/GitHub/CA_MaximizeScore/cmake-build-debug/CMakeFiles/CA_MaximizeScore.dir
+C:/Users/Ellis/Documents/GitHub/CA_MaximizeScore/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Ellis/Documents/GitHub/CA_MaximizeScore/cmake-build-debug/CMakeFiles/rebuild_cache.dir

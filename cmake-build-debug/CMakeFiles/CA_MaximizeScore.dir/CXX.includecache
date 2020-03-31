@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Ellis/Documents/GitHub/CA_MaximizeScore/main.cpp
+iostream
+-
+cstdlib
+-
+ctime
+-
+vector
+-
+
