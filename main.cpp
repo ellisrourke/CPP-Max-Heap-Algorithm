@@ -2,12 +2,11 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
+#include <tuple>
 
 class table{
 public:
-    table(){
-
-    };
+    table()= default;;
     static int coinFlip(){
         return rand() % 2;
     }
@@ -20,13 +19,13 @@ public:
             }
         return sum;
     }
-    int rustyMove(){
+    /*int rustyMove(){
         //chose ball with highest sum of digits
     }
     int scottMove(){
         //chose highest value ball
     }
-
+    */
 private:
 
 };
@@ -36,14 +35,14 @@ public:
     priorityQueue()= default;;
     bool isEmpty(){ return capacity==0; }
 
-    virtual int getMax(){ return queue[1]; }
+    virtual int getMax(){ return queue[1].second; }
+
     virtual void insertElement(int value){
         if(capacity + 1 <= queue.size()){
-            queue.push_back(0);
+            queue.emplace_back(std::make_pair(queue.size(),0));
         }
-        queue[++capacity] = value;
+        queue[++capacity] = std::make_pair(queue.size()-1,value);
         shiftUp(capacity);
-        dispQueue(queue);
     }
 
     virtual void shiftUp(int index){
@@ -72,35 +71,36 @@ public:
     }
 
     virtual void removeMax(){
-        int value = queue[1];
+        int value = queue[1].second;
         std::swap(queue[1],queue[capacity]);
         capacity--;
         shiftDown(1);
 
     };
-    static void dispQueue(std::vector<int> & arr){
-        for(int i=0;i<arr.size();i++){
-            std::cout<<arr[i] << " ";
+
+    virtual void dispQueue(){
+        for(int i=0;i<this->queue.size();i++){
+            std::cout<< "(" <<this->queue[i].first << " , " << this->queue[i].second << ")";
         }std::cout << std::endl;
     }
 protected:
-    std::vector<int> queue{-1};
+    std::vector<std::pair<int,int>> queue{std::make_pair(-1,-1)};
     int capacity{};
     static int parent(int const& index){ return (index/2); }
     static int leftChild(int const& index){ return (index*2); }
     static int rightChild(int const& index){ return (index*2)+1 ; }
 };
 
-class rustyQueue : public priorityQueue{ //<ball no, sum of digits
+class rustyQueue : public priorityQueue{ //<ball no,value, sum of digits>
 public:
-    int getMax(){ return queue[1].second; }
+    int getMax() override{ return std::get<2>(queue[1]); }
     void insertElement(int value) override {
         if(capacity + 1 <= queue.size()){
-            queue.emplace_back(queue.size(),0);
+            //queue.emplace_back(queue.size(),0);
+            queue.emplace_back(std::make_tuple(queue.size(),0,0));
         }
-        queue[++capacity] = std::make_pair(queue.size()-1,value);
+        queue[++capacity] = std::make_tuple(queue.size()-1,value,table::sumOfDigits(value));
         shiftUp(capacity);
-        dispQueue(queue);
     }
     void shiftUp(int index) override{
         if(index > capacity){ return; } //recursive base case
@@ -126,36 +126,46 @@ public:
         }
     }
     void removeMax() override {
-        int value = queue[1].second;
+        int value = std::get<2>(queue[1]);
         std::swap(queue[1],queue[capacity]);
         capacity--;
         shiftDown(1);
 
     };
-    static void dispQueue(std::vector<std::pair<int,int>>& arr){
-        for(int i=0;i<arr.size();i++){
-            std::cout<< "(" << arr[i].first << " , " <<arr[i].second << ")";
+    void dispQueue() override{
+        for(int i=0;i<this->queue.size();i++){
+            std::cout<< "(" << std::get<0>(this->queue[i]) << " , " <<std::get<1>(this->queue[i]) << " , " << std::get<2>(this->queue[i]) << ")";
         }std::cout << std::endl;
     }
 private:
-    std::vector<std::pair<int,int>> queue {std::make_pair(-1,-1)};
+    std::vector<std::tuple<int,int,int>> queue {std::make_tuple(-1,-1,-1)};
 };
 
 int main(int argc, char *argv[]) {
     srand(time(nullptr));
     int k = 0; //number of turns per round
     int n = 0; //number of balls on table
-    std::vector<int> myNumbers = {22, 97, 123}; // 4 16 6
+    std::vector<int> usedBalls = {};
 
-    priorityQueue maxHeap = *new priorityQueue;
     priorityQueue scottValues = *new priorityQueue;
     rustyQueue rustyValues = *new rustyQueue;
-    rustyValues.insertElement(table::sumOfDigits(11));
-    rustyValues.insertElement(table::sumOfDigits(1122));
-    rustyValues.insertElement(table::sumOfDigits(123));    ;
-    rustyValues.insertElement(table::sumOfDigits(1234));
-    //std::cout << rustyValues.getMax();
+    std::cout << "--- Rusty ---" << std::endl;
+    rustyValues.insertElement(11);
+    rustyValues.dispQueue();
+    rustyValues.insertElement(23);
+    rustyValues.dispQueue();
+    std::cout << rustyValues.getMax();
 
+    std::cout << std::endl << "--- Scott ---" << std::endl;
+    scottValues.insertElement(11);
+    scottValues.dispQueue();
+    scottValues.insertElement(23);
+    scottValues.dispQueue();
+    std::cout << scottValues.getMax();
+
+
+
+    //scottValues.insertElement(11);
 }
 //1 3 4 6 13 10 9 8 15 17
 //1 ,3 ,4 ,6 ,13 ,10 ,9 ,8 ,15 ,17
