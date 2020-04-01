@@ -95,7 +95,7 @@ protected:
 class rustyQueue : public priorityQueue{ //<ball no,value, sum of digits>
 public:
     using priorityQueue::priorityQueue;
-    int getMax() override{ return std::get<2>(queue[1]); }
+    int getMax() override{ return std::get<1>(queue[1]); }
     int getMaxIndex() override { return std::get<0>(queue[1]);}
     void insertElement(int value) override {
         if(capacity + 1 <= queue.size()){
@@ -150,11 +150,11 @@ private:
 
 int main(int argc, char *argv[]) {
     srand(time(nullptr));
-    int n = 3; //number of balls on table
+    int n = 8; //number of balls on table
     int k = 2; //number of turns per round
-    bool flip = 0; //were 1 = heads and 0 = tails // tails = rusty , heads = scott
+    bool flip = 1; //were 1 = heads and 0 = tails // tails = rusty , heads = scott
     std::vector<int> usedBalls = {};
-    std::vector<int> initialBalls = {1000, 99, 98};
+    std::vector<int> initialBalls = {50, 60, 20, 10, 90, 30, 60, 70};
     priorityQueue scottValues = *new priorityQueue(&usedBalls);
     rustyQueue rustyValues = *new rustyQueue(&usedBalls);
     int scottScore = 0;
@@ -165,35 +165,46 @@ int main(int argc, char *argv[]) {
         rustyValues.insertElement(initialBalls[i]);
     }
 
-    while(true){
-        for(int turn = 1;turn<=k;turn++){
-            if(usedBalls.size() == initialBalls.size()){break;}
-            if(flip){
-                if(std::find(usedBalls.begin(),usedBalls.end(),scottValues.getMaxIndex())!=usedBalls.end()){
-                    scottValues.removeMax();
-                    turn--;
-                } else {
+
+    while(!rustyValues.isEmpty() || !scottValues.isEmpty())  {
+        if (flip) { //scott turn
+            int turn = 0;
+            while (turn < k) {
+                if (!(std::find(usedBalls.begin(), usedBalls.end(), scottValues.getMaxIndex()) != usedBalls.end())) {
                     scottScore += scottValues.getMax();
                     scottValues.removeMax();
-
                 }
-            } else if(!flip){
-                if(std::find(usedBalls.begin(),usedBalls.end(),rustyValues.getMaxIndex())!=usedBalls.end()){
-                    rustyValues.removeMax();
-                    turn--;
-                } else {
+                turn++;
+            }
+            if (scottValues.isEmpty()) break;
+
+        } else { //rusty turn
+            int turn = 0;
+            while (turn < k) {
+                if (!(std::find(usedBalls.begin(), usedBalls.end(), rustyValues.getMaxIndex()) != usedBalls.end())) {
                     rustyScore += rustyValues.getMax();
                     rustyValues.removeMax();
-
                 }
+                turn++;
             }
-            flip ^= true;
+            if (rustyValues.isEmpty()) break;
         }
-        break;
-
+        flip ^= true;
     }
 
-    std::cout << rustyScore << " " << scottScore;
+//1000 197
+//240 150
+//2100000000 98888899
+//9751 2043
+//30105 17722
+//4648186903 4020309125
+//13823 12513
+//2174 1664
+//3923529875 3049188235
+//0 284401
+
+
+    std::cout << scottScore << " " << rustyScore;
 //toggle x = !x
 
 
