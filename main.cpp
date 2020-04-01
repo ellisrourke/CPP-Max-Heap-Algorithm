@@ -3,14 +3,8 @@
 #include <ctime>
 #include <vector>
 #include <tuple>
-
-class table{
-public:
-    table()= default;;
-    static int coinFlip(){
-        return rand() % 2;
-    }
-    static int sumOfDigits(int n){
+#include <algorithm>
+int sumOfDigits(int n){
             int sum = 0,m = 0;
             while(n>0){
                 m = n%10;
@@ -19,14 +13,6 @@ public:
             }
         return sum;
     }
-    /*int rustyMove(){
-        //chose ball with highest sum of digits
-    }
-    int scottMove(){
-        //chose highest value ball
-    }
-    */
-};
 
 class priorityQueue{
 public:
@@ -36,6 +22,7 @@ public:
     bool isEmpty(){ return capacity==0; }
 
     virtual int getMax(){ return queue[1].second; }
+    virtual int getMaxIndex(){ return queue[1].first; }
 
     virtual void insertElement(int value){
         if(capacity + 1 <= queue.size()){
@@ -73,7 +60,7 @@ public:
 
     virtual void removeMax(){
         int value = queue[1].second;
-        std::cout << std::endl << value << std::endl;
+        //std::cout << std::endl << value << std::endl;
         updateUsedBalls(queue[1].first);
         std::swap(queue[1],queue[capacity--]);
         shiftDown(1);
@@ -109,12 +96,13 @@ class rustyQueue : public priorityQueue{ //<ball no,value, sum of digits>
 public:
     using priorityQueue::priorityQueue;
     int getMax() override{ return std::get<2>(queue[1]); }
+    int getMaxIndex() override { return std::get<0>(queue[1]);}
     void insertElement(int value) override {
         if(capacity + 1 <= queue.size()){
             //queue.emplace_back(queue.size(),0);
             queue.emplace_back(std::make_tuple(queue.size(),0,0));
         }
-        queue[++capacity] = std::make_tuple(queue.size()-1,value,table::sumOfDigits(value));
+        queue[++capacity] = std::make_tuple(queue.size()-1,value,sumOfDigits(value));
         shiftUp(capacity);
     }
     void shiftUp(int index) override{
@@ -159,24 +147,57 @@ private:
     std::vector<std::tuple<int,int,int>> queue {std::make_tuple(-1,-1,-1)};
 };
 
+
 int main(int argc, char *argv[]) {
     srand(time(nullptr));
-    int k = 0; //number of turns per round
-    int n = 0; //number of balls on table
+    int n = 3; //number of balls on table
+    int k = 2; //number of turns per round
+    bool flip = 0; //were 1 = heads and 0 = tails // tails = rusty , heads = scott
     std::vector<int> usedBalls = {};
+    std::vector<int> initialBalls = {1000, 99, 98};
     priorityQueue scottValues = *new priorityQueue(&usedBalls);
     rustyQueue rustyValues = *new rustyQueue(&usedBalls);
-    scottValues.insertElement(12);
-    scottValues.insertElement(54);
-    scottValues.insertElement(11);
-    scottValues.dispQueue();
-    scottValues.removeMax();
-    scottValues.dispQueue();
-    scottValues.removeMax();
-    scottValues.dispQueue();
-    //scottValues.update(12);
+    int scottScore = 0;
+    int rustyScore = 0;
 
-    rustyValues.displayUsedBalls();
+    for (int i = 0; i < initialBalls.size(); i++) {
+        scottValues.insertElement(initialBalls[i]);
+        rustyValues.insertElement(initialBalls[i]);
+    }
+
+    while(true){
+        for(int turn = 1;turn<=k;turn++){
+            if(usedBalls.size() == initialBalls.size()){break;}
+            if(flip){
+                if(std::find(usedBalls.begin(),usedBalls.end(),scottValues.getMaxIndex())!=usedBalls.end()){
+                    scottValues.removeMax();
+                    turn--;
+                } else {
+                    scottScore += scottValues.getMax();
+                    scottValues.removeMax();
+
+                }
+            } else if(!flip){
+                if(std::find(usedBalls.begin(),usedBalls.end(),rustyValues.getMaxIndex())!=usedBalls.end()){
+                    rustyValues.removeMax();
+                    turn--;
+                } else {
+                    rustyScore += rustyValues.getMax();
+                    rustyValues.removeMax();
+
+                }
+            }
+            flip ^= true;
+        }
+        break;
+
+    }
+
+    std::cout << rustyScore << " " << scottScore;
+//toggle x = !x
+
+
+
     //sample input
     //2 - number of test cases
     //3 2 - n & k where n =n number of balls, k = number of turns
@@ -184,6 +205,3 @@ int main(int argc, char *argv[]) {
     //TAILS - result of coin flip(T = Rusty, H = Scott)
 
 }
-//1 3 4 6 13 10 9 8 15 17
-//1 ,3 ,4 ,6 ,13 ,10 ,9 ,8 ,15 ,17
-//8 3 1 6 13 10 9 4 15 17
