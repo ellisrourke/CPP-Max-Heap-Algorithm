@@ -131,11 +131,18 @@ public:
     void removeMax() override {
         int value = std::get<2>(queue[1]);
         updateUsedBalls(std::get<0>(queue[1]));
-        std::swap(queue[1],queue[capacity]);
-        capacity--;
+        std::swap(queue[1],queue[capacity--]);
         shiftDown(1);
 
     };
+    //    virtual void removeMax(){
+    //        int value = queue[1].second;
+    //        //std::cout << std::endl << value << std::endl;
+    //        updateUsedBalls(queue[1].first);
+    //        std::swap(queue[1],queue[capacity--]);
+    //        shiftDown(1);
+    //        //capacity--;
+    //    };
     void dispQueue() override{
         for(int i=0;i<capacity+1;i++){
             std::cout<< "(" << std::get<0>(this->queue[i]) << " , " <<std::get<1>(this->queue[i]) << " , " << std::get<2>(this->queue[i]) << ")";
@@ -143,18 +150,18 @@ public:
     }
     std::vector<int> usedBalls;
 private:
-    //std::vector<int> usedBalls;
     std::vector<std::tuple<int,int,int>> queue {std::make_tuple(-1,-1,-1)};
 };
 
 
 int main(int argc, char *argv[]) {
     srand(time(nullptr));
-    int n = 8; //number of balls on table
-    int k = 2; //number of turns per round
+    int n = 20; //number of balls on table
+    int k = 1; //number of turns per round
     bool flip = 1; //were 1 = heads and 0 = tails // tails = rusty , heads = scott
     std::vector<int> usedBalls = {};
-    std::vector<int> initialBalls = {50, 60, 20, 10, 90, 30, 60, 70};
+    std::vector<int> initialBalls = {76,89,49,2,31,311,56,445,343,100,900,111,323,232,32,35,6456,565,760,878};
+    //std::vector<int> initialBalls = {76 ,89 ,49 ,2 ,31 ,311 ,56 ,445 ,343 ,100 ,900 ,111 ,323 ,232 ,32 ,35 ,6456 ,565 ,760 ,878,};
     priorityQueue scottValues = *new priorityQueue(&usedBalls);
     rustyQueue rustyValues = *new rustyQueue(&usedBalls);
     int scottScore = 0;
@@ -166,28 +173,37 @@ int main(int argc, char *argv[]) {
     }
 
 
-    while(!rustyValues.isEmpty() || !scottValues.isEmpty())  {
+    while(usedBalls.size() <= initialBalls.size())  {
         if (flip) { //scott turn
             int turn = 0;
             while (turn < k) {
+                if(scottValues.isEmpty()){break;}
+
                 if (!(std::find(usedBalls.begin(), usedBalls.end(), scottValues.getMaxIndex()) != usedBalls.end())) {
+                    std::cout << "scott turn" << std::endl;
                     scottScore += scottValues.getMax();
                     scottValues.removeMax();
+                    turn++;
+                } else {
+                    scottValues.removeMax();
                 }
-                turn++;
             }
-            if (scottValues.isEmpty()) break;
-
         } else { //rusty turn
             int turn = 0;
             while (turn < k) {
+                if(rustyValues.isEmpty()){break;}
                 if (!(std::find(usedBalls.begin(), usedBalls.end(), rustyValues.getMaxIndex()) != usedBalls.end())) {
+                    std::cout << "rusty turn" << std::endl;
                     rustyScore += rustyValues.getMax();
                     rustyValues.removeMax();
+                    turn++;
+                } else {
+                    rustyValues.removeMax();
                 }
-                turn++;
+
+
+
             }
-            if (rustyValues.isEmpty()) break;
         }
         flip ^= true;
     }
@@ -204,7 +220,7 @@ int main(int argc, char *argv[]) {
 //0 284401
 
 
-    std::cout << scottScore << " " << rustyScore;
+    std::cout << "scores " << scottScore << " " << rustyScore;
 //toggle x = !x
 
 
@@ -216,3 +232,5 @@ int main(int argc, char *argv[]) {
     //TAILS - result of coin flip(T = Rusty, H = Scott)
 
 }
+//2100000000 98888899
+//2100000000 98888899
