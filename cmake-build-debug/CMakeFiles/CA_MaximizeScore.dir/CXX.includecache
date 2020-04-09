@@ -9,6 +9,10 @@
 C:/Users/Ellis/Documents/GitHub/CA_MaximizeScore/main.cpp
 iostream
 -
+fstream
+-
+sstream
+-
 cstdlib
 -
 ctime
@@ -20,5 +24,7 @@ tuple
 algorithm
 -
 unordered_map
+-
+string
 -
 
