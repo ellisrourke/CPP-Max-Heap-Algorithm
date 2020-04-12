@@ -64,9 +64,9 @@ public:
             std::cout<< "(" <<this->queue[i].first << " , " << this->queue[i].second << ")";
         }std::cout << std::endl;
     }
-    std::vector<int> *usedBalls;
+    std::vector<unsigned long int> *usedBalls;
 protected:
-    std::vector<std::pair<int,int>> queue{std::make_pair(-1,-1)};
+    std::vector<std::pair<int,unsigned long int>> queue{std::make_pair(-1,-1)};
     int capacity{};
     static int parent(int const& index){ return (index/2); }
     static int leftChild(int const& index){ return (index*2); }
@@ -118,21 +118,21 @@ public:
             std::cout<< "(" << std::get<0>(this->queue[i]) << " , " <<std::get<1>(this->queue[i]) << " , " << std::get<2>(this->queue[i]) << ")";
         }std::cout << std::endl;
     }
-    std::vector<int> usedBalls;
+    std::vector<unsigned long int> usedBalls;
 private:
-    std::vector<std::tuple<int,int,int>> queue {std::make_tuple(-1,-1,-1)};
+    std::vector<std::tuple<int,unsigned long int,unsigned long int>> queue {std::make_tuple(-1,-1,-1)};
 };
 
-void runTestCase(int n, int k, bool flip, std::vector<int> &initialBalls){
+void runTestCase(int n, int k, bool flip, std::vector<unsigned long int> &initialBalls){
 
-    std::vector<int> usedBalls = {};
+    std::vector<unsigned long int> usedBalls = {};
     std::unordered_map<int, bool> used;
 
     priorityQueue scottValues = *new priorityQueue();
     rustyQueue rustyValues = *new rustyQueue();
 
-    int scottScore = 0;
-    int rustyScore = 0;
+    unsigned long int scottScore = 0;
+    unsigned long int rustyScore = 0;
     int totalTurns =0;
 
     for (int i = 0; i < n; i++) {
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
     int n = 0;
     int k = 0;
     bool flip = false;
-    std::vector<int> balls;
+    std::vector<unsigned long int> balls;
 
     std::ifstream inFile;
     inFile.open(argv[1]);
@@ -204,7 +204,6 @@ int main(int argc, char *argv[]) {
 
     int lineCount = 1;
     while(std::getline(inFile,inLine)){
-
         std::istringstream iss(inLine);
 
         if(lineCount == 1){
@@ -215,14 +214,17 @@ int main(int argc, char *argv[]) {
         } else if (lineCount == 2){
             int i = 0;
             while(iss >> buffer){
-                balls.push_back(std::stoi(buffer));
-                i++;
+                    balls.push_back(std::stoi(buffer));
+                    i++;
             }
         } else if (lineCount == 3){
-            iss >> buffer;
-            flip = buffer == "HEADS";
+            flip = inLine == "HEADS";
+            //std::cout << "---------" << std::endl;
+
+            //std::cout << flip << std::endl;
             lineCount = 0;
             runTestCase(n,k,flip,balls);
+            //std::cout << "---------" << std::endl;
             balls = {};
         }
         lineCount++;
@@ -233,8 +235,8 @@ int main(int argc, char *argv[]) {
 //2100000000 98888899
 //9538 2256
 //30031 17796
-//4726793900 3941702128 xx
+//todo 4726793900 3941702128 //scores 431826604 3941702128
 //13793 12543
-//2173 1665 xx
-//3923529875 3049188235 xx
+//todo 2173 1665 // scores 2195 1643 xxx
+//3923529875 3049188235
 //0 284401
